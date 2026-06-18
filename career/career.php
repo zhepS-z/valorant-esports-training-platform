@@ -85,7 +85,7 @@ if (empty($region)) {
     $region = 'ap'; // Fallback to AP region
 }
 
-$API_KEY = 'HDEV-1a5b2355-49ed-4abc-9c97-8cad2223a1a8'; // โหลดจาก apikey.php
+$API_KEY = 'XXXXX'; // Replace with your actual API key from apikey.php
 
 $parts = explode('#', $full_id);
 

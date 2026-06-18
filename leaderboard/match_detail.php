@@ -9,7 +9,7 @@ if (!isset($_GET['matchid'])) {
     exit;
 }
 $matchid = $_GET['matchid'];
-$api_key = 'HDEV-1a5b2355-49ed-4abc-9c97-8cad2223a1a8';
+$api_key = 'XXXXX'; // Replace with your actual API key
 
 function call_api($url, $api_key) {
     $options = [

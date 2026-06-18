@@ -5,4 +5,4 @@ if (!defined('ACCESS')) {
 }
 
 // Define API Key
-$api_key = 'HDEV-1a5b2355-49ed-4abc-9c97-8cad2223a1a8';
+$api_key = 'XXXXX'; // Replace with your actual API key

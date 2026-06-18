@@ -51,7 +51,7 @@ $full_id = isset($_GET['riot_id']) ? $_GET['riot_id'] : null;
 
 // รับ region จาก URL 
 $region = isset($_GET['region']) ? strtolower(trim($_GET['region'])) : 'ap';
-$api_key = 'HDEV-1a5b2355-49ed-4abc-9c97-8cad2223a1a8';
+$api_key = 'XXXXX'; // Replace with your actual API key
 
 if (!$full_id || strpos($full_id, '#') === false) {
     $data = null;
