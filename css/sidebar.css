@@ -1,0 +1,244 @@
+:root {
+        --sidebar-width-open: 260px;
+        --sidebar-width-closed: 72px;
+    }
+    /* Sidebar styles */
+    #sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: var(--sidebar-width-open);
+        min-height: 100vh;
+        /* เปลี่ยนจากสีทึบเป็นโทน gradient เหมือน navbar */
+        background: linear-gradient(180deg, rgba(2,17,26,0.95), rgba(1,26,38,0.95)) !important;
+        color: #fff;
+        z-index: 1040;
+        transition: transform 0.3s cubic-bezier(.4,2,.6,1), box-shadow 0.3s, width 0.3s cubic-bezier(.4,2,.6,1);
+        transform: translateX(0);
+        box-shadow: 2px 0 12px rgba(0,0,0,0.07);
+        overflow-x: hidden;
+        font-size: 1rem;
+        font-weight: 600;
+        border-right: 1px solid rgba(255,255,255,0.03); /* เพิ่มเส้นแบ่งแบบ navbar */
+    }
+    #sidebar.closed {
+        width: var(--sidebar-width-closed);
+        transform: translateX(0);
+        /* ปรับสีเมื่อปิดให้เข้มขึ้นเล็กน้อย */
+        background: linear-gradient(180deg, rgba(1,12,18,0.98), rgba(1,18,26,0.98)) !important;
+    }
+    #sidebar .nav-link {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        text-align: left;
+        padding-left: 1.2rem;
+        transition: background 0.2s, justify-content 0.2s, padding 0.2s, color 0.15s ease, transform 0.15s ease;
+        min-height: 48px;
+        margin-bottom: 6px;             /* ช่องว่างระหว่างปุ่ม */
+        border-radius: 8px;             /* ทำมุมมนให้เห็นช่องว่างชัดเจน */
+        overflow: hidden;               /* ป้องกัน background ล้นมุม */
+        color: rgba(255,255,255,0.78); /* โทนเดียวกับ navbar nav-link */
+    }
+    #sidebar .nav-link:hover,
+    #sidebar .nav-link:focus {
+        color: #fff;
+        transform: translateY(-2px);
+        background: rgba(255,255,255,0.02);
+    }
+    #sidebar.closed .nav-link {
+        justify-content: center;
+        padding-left: 0;
+    }
+    #sidebar .sidebar-label {
+        transition: opacity 0.2s, width 0.2s;
+        opacity: 1;
+        white-space: nowrap;
+    }
+    #sidebar.closed .sidebar-label {
+        display: none !important;
+        width: 0;
+        margin: 0;
+        padding: 0;
+    }
+    #sidebar .sidebar-logo-text {
+        transition: opacity 0.2s;
+        opacity: 1;
+        margin-left: 8px;
+        color: #fff;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+    }
+    #sidebar.closed .sidebar-logo-text {
+        opacity: 0;
+        width: 0;
+        margin-left: 0;
+    }
+    #sidebar .sidebar-logo-img {
+        transition: margin 0.2s;
+        margin-right: 8px;
+    }
+    #sidebar.closed .sidebar-logo-img {
+        margin-right: 0;
+    }
+    #sidebar-toggle {
+        position: fixed;
+        top: 18px;
+        left: 18px;
+        z-index: 1100;
+        background: #fff;
+        border: none;
+        border-radius: 50%;
+        width: 38px;
+        height: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        transition: left 0.3s;
+    }
+    #sidebar.closed ~ #sidebar-toggle {
+        left: 18px;
+    }
+    body.with-sidebar {
+        margin-left: 260px !important;
+        transition: margin-left 0.3s cubic-bezier(.4,2,.6,1);
+    }
+    body.no-sidebar {
+        margin-left: 72px !important;
+        transition: margin-left 0.3s cubic-bezier(.4,2,.6,1);
+    }
+    @media (max-width: 900px) {
+        body.with-sidebar, body.no-sidebar {
+            margin-left: 0 !important;
+        }
+        #sidebar {
+            width: 80vw;
+            min-width: 56px;
+            max-width: 320px;
+        }
+        #sidebar.closed {
+            width: 56px;
+        }
+    }
+
+    .sidebar-toggle-btn {
+        position: fixed;
+        top: 32px;
+        right: calc(100vw - var(--sidebar-width-open) - 22px);
+        left: auto;
+        z-index: 1200;
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: #18191c;
+        border: 2px solid #222;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: right 0.3s cubic-bezier(.4,2,.6,1), background 0.2s;
+        padding: 0;
+        cursor: pointer;
+        
+    }
+    #sidebar.closed ~ .sidebar-toggle-btn {
+        right: calc(100vw - var(--sidebar-width-closed) - 22px);
+    }
+    .sidebar-toggle-btn:hover {
+        background: #23242a;
+    }
+    #sidebar-toggle-icon {
+        transition: transform 0.3s;
+    }
+    #sidebar.closed ~ .sidebar-toggle-btn #sidebar-toggle-icon {
+        transform: rotate(180deg);
+    }
+    @media (max-width: 900px) {
+        .sidebar-toggle-btn {
+            right: calc(100vw - 80vw - 22px);
+            left: auto;
+        }
+        #sidebar.closed ~ .sidebar-toggle-btn {
+            right: calc(100vw - 56px - 22px);
+        }
+    }
+
+    /* Dropdown: เต็ม sidebar ตอนเปิด, แคบตอนปิด */
+    #sidebar .dropdown-menu.dropdown-menu-dark {
+        background: linear-gradient(180deg, rgba(2,17,26,0.95), rgba(1,26,38,0.95));
+        border-radius: 12px;
+        box-shadow: 0 8px 24px rgba(2,17,26,0.45);
+        border: 1px solid rgba(255,255,255,0.03);
+        min-width: 180px;
+        padding: 8px 0;
+        width: calc(100% - 16px);
+        left: 8px !important;
+        transition: width 0.2s, left 0.2s, background 0.2s;
+    }
+
+    /* เมื่อ sidebar ปิด: dropdown แคบและซ่อน label */
+    #sidebar.closed .dropdown-menu.dropdown-menu-dark {
+        width: 56px;
+        min-width: 56px;
+        left: 0 !important;
+        padding: 4px 0;
+        text-align: center;
+    }
+    #sidebar.closed .dropdown-menu .dropdown-item {
+        justify-content: center;
+        padding: 10px 0;
+    }
+    #sidebar.closed .dropdown-menu .dropdown-item .sidebar-label,
+    #sidebar.closed .dropdown-menu .dropdown-item span,
+    #sidebar.closed .dropdown-menu .dropdown-item strong {
+        display: none !important;
+    }
+
+    .dropdown-menu .dropdown-item {
+        color: rgba(255,255,255,0.9);
+        border-radius: 8px;
+        margin: 2px 8px;
+        padding: 10px 16px;
+        transition: background 0.15s, color 0.15s;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .dropdown-menu .dropdown-item:hover,
+    .dropdown-menu .dropdown-item:focus {
+        background: rgba(255,255,255,0.04);
+        color: #fff;
+    }
+
+    .dropdown-menu .dropdown-divider {
+        border-color: #34353a;
+    }
+
+    #sidebar.closed .nav-link img {
+        margin-right: 0 !important;
+    }
+    /* เมื่อ sidebar ปิด: icon อยู่ตรงกลางและขยับขวา */
+#sidebar.closed .nav-link i,
+#sidebar.closed .nav-link i {
+
+    transition: margin 0.2s, color 0.2s, font-size 0.2s;
+}
+#sidebar.closed .nav-link i {
+    margin-left: 12px;
+    color: #ffffff !important; /* สีแดง */
+}
+        /* ลดความสูงเล็กน้อยของรายการที่ active (override Bootstrap) */
+        #sidebar .nav-link.active.bg-danger,
+        #sidebar .list-unstyled .nav-link.py-2.active.bg-danger {
+            padding-top: 6px !important;
+            padding-bottom: 6px !important;
+            line-height: 1.2 !important;
+            height: auto !important;
+        }
+        /* ปรับขนาดไอคอน/ข้อความถ้าจำเป็น */
+        #sidebar .nav-link.active.bg-danger .sidebar-label {
+            display: inline-block;
+            line-height: 1.2;
+        }

@@ -1,0 +1,12 @@
+RewriteEngine On
+
+# career → career/career.php
+RewriteRule ^career/?$ career/career.php [L]
+
+# profile → profile/profile.php
+RewriteRule ^profile/?$ profile/profile.php [L]
+
+# leaderboard → leaderboard/leaderboard.php
+RewriteRule ^leaderboard/?$ leaderboard/leaderboard.php [L]
+
+# เพิ่มกฎอื่นๆ

@@ -1,0 +1,235 @@
+/* เพิ่มเงาให้กับตาราง */
+    table {
+        width: 100%;
+        padding: 15px;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* เพิ่มเงา */
+        background: linear-gradient(145deg, #1e1e1e, #2a2a2a); /* สีพื้นหลังแบบ gradient */
+    }
+
+    /* เพิ่มเอฟเฟกต์ hover ให้กับแถว */
+    tbody tr:hover {
+        background-color: #333; /* เปลี่ยนสีเมื่อ hover */
+        transform: scale(1.01); /* ขยายเล็กน้อย */
+        transition: all 0.3s ease; /* เพิ่มการเปลี่ยนแปลงที่นุ่มนวล */
+    }
+
+    thead th {
+        background-color: #01182a !important; /* สีของ thead */
+        color: rgb(172, 172, 172);
+        font-size: 0.9rem;
+        text-align: center; /* จัดข้อความให้อยู่ตรงกลางในแนวนอน */
+        height: 40px;
+        vertical-align: middle; /* จัดข้อความให้อยู่ตรงกลางในแนวตั้ง */
+    }
+
+
+
+    tbody tr {
+        height: 50px; /* เพิ่มความสูงของแต่ละแถว */
+    }
+
+    tbody td {
+        vertical-align: middle; /* จัดข้อความให้อยู่ตรงกลางในแนวตั้ง */
+        color: white; /* สีข้อความ */
+    }
+
+    tbody th{
+        vertical-align: middle; /* จัดข้อความให้อยู่ตรงกลางในแนวตั้ง */
+        color: white; /* สีข้อความ */
+        text-align: center; /* จัดข้อความให้อยู่ตรงกลางในแนวนอน */
+    }
+
+    .tag {
+        display: inline-block;
+        background-color: #444; /* สีพื้นหลังของ tag */
+        color: rgb(212, 212, 212); /* สีข้อความ */
+        font-size: 0.6em; /* ขนาดตัวอักษร */
+        padding: 2px 6px; /* ระยะห่างภายใน */
+        margin-left: 5px; /* ระยะห่างจากชื่อ */
+        border-radius: 4px; /* มุมโค้งมน */
+        font-weight: bold; /* ตัวหนา */
+    }
+
+    .highlight-row {
+        height: 100px; /* เพิ่มความสูงของแถว */
+        font-size: 2rem; /* เพิ่มขนาดตัวอักษร */
+        font-weight: bold; /* ตัวหนา */
+        color: black ; /* เปลี่ยนสีข้อความเป็นสีดำเพื่อให้มองเห็นชัดเจน */
+        box-shadow: 0 4px 10px rgba(255, 215, 0, 0.5); /* เพิ่มเงาสีทอง */
+        transform: scale(1); /* ขยายเล็กน้อย */
+        transition: all 0.3s ease; /* เพิ่มการเปลี่ยนแปลงที่นุ่มนวล */
+    }
+    .highlight-row img {
+        width: 80px !important;
+        height: 80px !important;
+    }
+
+
+
+
+    tbody tr.highlight-gold {
+        box-shadow: 0 0 15px 5px rgba(255, 215, 0, 0.5); /* เงาสีทองรอบด้าน */
+        height: 70px; /* ขนาดแถว */
+        font-size: 2rem; /* ขนาดตัวอักษร */
+        background:linear-gradient(to right,rgba(255, 215, 0, 0.5),#343a40)  !important;
+    }
+
+
+
+    tbody tr.highlight-silver {
+        box-shadow: 0 0 15px 5px rgba(192, 192, 192, 0.5); /* เงาสีเงินรอบด้าน */
+        height: 60px; /* ขนาดแถวเล็กกว่าอันดับ 1 */
+        font-size: 1.8rem; /* ขนาดตัวอักษรเล็กกว่าอันดับ 1 */
+        background:linear-gradient(to right,rgba(192, 192, 192, 0.5),#212529)  !important; /* สีพื้นหลังแบบโปร่งใส */
+    }
+
+
+    tbody tr.highlight-bronze {
+        box-shadow: 0 0 15px 5px rgba(205, 127, 50, 0.5); /* เงาสีทองแดงรอบด้าน */
+        height: 50px; /* ขนาดแถวเล็กกว่าอันดับ 2 */
+        font-size: 1.6rem; /* ขนาดตัวอักษรเล็กกว่าอันดับ 2 */
+        background:linear-gradient(to right,rgba(205, 127, 50, 0.5),#343a40)  !important;
+    }
+
+    /* ปรับขนาดรูปภาพใน highlight-row */
+    .highlight-row img {
+        width: 60px !important; /* ขนาดรูปภาพสำหรับอันดับ 1 */
+        height: 60px !important;
+    }
+
+    .highlight-silver img {
+        width: 50px !important; /* ขนาดรูปภาพสำหรับอันดับ 2 */
+        height: 50px !important;
+    }
+
+    .highlight-bronze img {
+        width: 40px !important; /* ขนาดรูปภาพสำหรับอันดับ 3 */
+        height: 40px !important;
+    }
+
+    /* ปรับแต่งปุ่ม */
+    button {
+        background-color: #01182a;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+        background-color: #022d4f; /* เปลี่ยนสีเมื่อ hover */
+    }
+
+    /* ปรับแต่งหัวข้อ */
+    h1 {
+        text-align: center;
+        color: white;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); /* เพิ่มเงาให้ข้อความ */
+        margin-bottom: 20px;
+    }
+
+
+
+    @media (max-width: 768px) {
+        .tier-text {
+            display: none;
+        }
+    }
+    #leaderboard a {
+        color: inherit; /* ใช้สีเดียวกับข้อความปกติ */
+        text-decoration: none; /* ลบเส้นใต้ */
+        transition: color 0.2s;
+    }
+    
+    #leaderboard a:hover {
+        color: rgba(255, 221, 0, 0.762); /* เปลี่ยนสีเมื่อ hover (ถ้าต้องการ) */
+    }
+
+    tbody tr:nth-child(odd) {
+        background-color: #343a40; /* สีเทาเข้มสำหรับแถวคี่ */
+    }
+    
+    tbody tr:nth-child(even) {
+        background-color: #212529; /* สีดำเข้มสำหรับแถวคู่ */
+    }
+
+    /* ซ่อนเส้นขอบระหว่างแถวของตาราง */
+    #leaderboard {
+        border-collapse: collapse; /* รวมเส้นขอบ */
+    }
+
+    #leaderboard th, #leaderboard td {
+        border: none; /* ซ่อนเส้นขอบของเซลล์ */
+    }
+
+/* ทำให้ตารางสามารถเลื่อนในหน้าจอขนาดเล็ก */
+.table-responsive {
+    position: relative;
+    overflow-x: auto; /* เพิ่ม scroll แนวนอน */
+    -webkit-overflow-scrolling: touch; /* รองรับการเลื่อนบนอุปกรณ์สัมผัส */
+}
+
+/* ปรับขนาดฟอนต์และความสูงของแถวในหน้าจอขนาดเล็ก */
+@media (max-width: 768px) {
+    table {
+        font-size: 0.8rem; /* ลดขนาดฟอนต์ */
+    }
+
+    tbody tr {
+        height: auto; /* ปรับความสูงของแถวให้อัตโนมัติ */
+    }
+
+    .highlight-row {
+        font-size: 1.2rem; /* ลดขนาดตัวอักษรใน highlight-row */
+    }
+
+    .highlight-row img {
+        width: 50px !important; /* ลดขนาดรูปภาพ */
+        height: 50px !important;
+    }
+
+    .pagination {
+        font-size: 0.8rem; /* ลดขนาดฟอนต์ของ pagination */
+    }
+
+    .tier-text {
+        display: none; /* ซ่อนข้อความ tier-text */
+    }
+}
+
+/* ปรับฟอร์มให้จัดเรียงในแนวตั้งในหน้าจอขนาดเล็ก */
+@media (max-width: 576px) {
+    form {
+        display: flex;
+        flex-direction: column;
+        gap: 10px; /* เพิ่มระยะห่างระหว่างฟิลด์ */
+    }
+
+    form label, form select, form button {
+        width: 100%; /* ให้ฟิลด์ขยายเต็มความกว้าง */
+    }
+}
+
+
+.team-detail-link {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+.team-detail-link:hover, .team-detail-link:focus {
+    color: #FFD700; /* สีทอง */
+}
+
+      .offcanvas-body {
+        background: #01111c !important;
+        color: #fff;
+      }
+
+      .offcanvas-header, .offcanvas-title {
+    background: #01111c !important;
+    color: #fff !important;
+}

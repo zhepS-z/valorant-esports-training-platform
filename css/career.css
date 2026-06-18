@@ -1,0 +1,48 @@
+/* ตัวอย่าง CSS สำหรับ Match History Table */
+.match-history-table {
+    border-radius: 12px;
+    overflow: hidden;
+    background: #181a1b;
+    margin-bottom: 2rem;
+}
+.match-history-table th, .match-history-table td {
+    vertical-align: middle;
+    text-align: center;
+}
+.match-history-table th {
+    background: #23272b;
+    color: #fff;
+    font-size: 1.1rem;
+    border-bottom: 2px solid #343a40;
+}
+.match-history-table tr {
+    transition: background 0.2s;
+}
+.match-history-table .agent-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid #343a40;
+    background: #23272b;
+}
+.match-history-table .badge {
+    font-size: 1rem;
+    border-radius: 8px;
+    padding: 0.4em 1em;
+}
+.match-history-table .bg-success { background: #1e824c !important; }
+.match-history-table .bg-danger { background: #c0392b !important; }
+.match-history-table .bg-primary { background: #2980b9 !important; }
+.match-history-table .bg-secondary { background: #23272b !important; }
+.match-history-table .text-muted { color: #b0b3b8 !important; }
+.match-history-table .text-white { color: #fff !important; }
+@media (max-width: 768px) {
+    .match-history-table th, .match-history-table td {
+        font-size: 0.95rem;
+        padding: 0.4em;
+    }
+    .match-history-table .agent-icon {
+        width: 32px;
+        height: 32px;
+    }
+}

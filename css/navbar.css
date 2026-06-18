@@ -1,0 +1,204 @@
+.navbar {
+  background: linear-gradient(180deg, rgba(2,17,26,0.95), rgba(1,26,38,0.95));
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  padding: 0.6rem 1rem;
+}
+.navbar .navbar-brand { 
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  color: #fff;
+}
+.navbar .nav-link {
+  color: rgba(255,255,255,0.78);
+  margin-right: 0.5rem;
+  transition: color .15s ease, transform .15s ease;
+}
+.navbar .nav-link:hover { color: #fff; transform: translateY(-2px); }
+.navbar.bg-dark {
+    background-color: #01182a !important;
+}
+
+.navbar .nav-link {
+    font-weight: 600 !important;
+    position: relative !important;
+    margin: 0 10px !important;
+}
+
+.navbar .nav-link.active {
+    text-decoration: underline !important;
+    text-decoration-color: #dc3545 !important;
+    text-underline-offset: 10px !important;
+    text-decoration-thickness: 2px !important;
+}
+
+/* Optional: Add hover effect */
+.navbar .nav-link:hover {
+    opacity: 0.8 !important;
+}
+
+/* Adjust search bar margin for mobile screens */
+@media (max-width: 576px) {
+    .navbar form {
+        margin-top: 20px !important;
+    }
+}
+
+/* Set dropdown background color */
+
+
+#chatPopup, #notifPopup {
+    position: fixed !important;
+    max-height: 75vh !important;
+    background: #01182a !important;
+    color: #fff !important;
+    border-radius: 8px !important;
+    box-shadow: 0 6px 24px rgba(0,0,0,.45) !important;
+    z-index: 2050 !important;
+    overflow: hidden !important;
+    display: none !important;
+    border: 1px solid rgba(255,255,255,0.06) !important;
+    transform-origin: top right !important;
+}
+#chatPopup { width: 380px !important; }
+#notifPopup { width: 320px !important; } /* กำหนดขนาดสำหรับ notification */
+#chatPopup.show, #notifPopup.show {
+    display: block !important;
+    animation: chatPop .12s ease !important;
+}
+@keyframes chatPop {
+    from { transform: scale(.98) !important; opacity: 0 !important; }
+    to { transform: scale(1) !important; opacity: 1 !important; }
+}
+#chatPopup .header, #notifPopup .header {
+    padding: 12px 14px !important;
+    border-bottom: 1px solid rgba(255,255,255,0.06) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+}
+#chatPopup .body, #notifPopup .body {
+    overflow: auto !important;
+    max-height: calc(75vh - 120px) !important;
+    padding: 12px !important;
+}
+#chatPopup .footer { padding: 10px !important; border-top: 1px solid rgba(255,255,255,0.04) !important; }
+#chatPopup .list-group-item, #notifPopup .list-group-item {
+    background: transparent !important;
+    border: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+#chatPopup .search-input { background: #111 !important; border: 1px solid rgba(255,255,255,0.06) !important; color: #fff !important; }
+/* Notification popup: ปรับให้ข้อความหลักเป็นสีขาว และเข้ากับ style.css (dark theme) */
+#notifPopup {
+  background: #01182a !important; /* ตาม style.css */
+  color: #e9ecef !important;      /* โทนตัวอักษรหลักเข้ากับ team-card */
+}
+
+/* ให้ข้อความหลักในรายการแจ้งเตือนเป็นสีขาว */
+#notifPopup .list-group-item,
+#notifPopup .list-group-item .flex-grow-1,
+#notifPopup .list-group-item .flex-grow-1 > div,
+#notifPopup .list-group-item strong,
+#notifPopup a {
+  color: #ffffff !important;
+}
+
+/* เวลา/ข้อความรองให้ดูจางลงเล็กน้อย (แต่ยังอ่านได้บนพื้นหลังมืด) */
+#notifPopup .list-group-item small,
+#notifPopup .text-secondary,
+#notifPopup .text-muted {
+  color: rgba(255,255,255,0.65) !important;
+}
+
+/* ไอคอนให้คงโทนสีเดิมแต่สดขึ้นเล็กน้อยบนพื้นหลังมืด */
+#notifPopup .me-2 i {
+  opacity: 0.95 !important;
+  font-size: 1.05rem !important;
+}
+
+/* hover/focus ของแต่ละรายการ */
+#notifPopup .list-group-item:hover,
+#notifPopup .list-group-item:focus {
+  background: rgba(255,255,255,0.02) !important;
+  color: #fff !important;
+}
+
+/* ลิงก์ใน popup ให้ไม่มี underline และมี padding เหมือนรายการ */
+#notifPopup a {
+  text-decoration: none !important;
+  display: flex !important;
+  align-items: flex-start !important;
+  padding: .5rem .75rem !important;
+}
+
+/* scrollbar ใน popup ให้เข้ากับ style.css */
+#notifPopup .body::-webkit-scrollbar { width: 8px !important; }
+#notifPopup .body::-webkit-scrollbar-thumb { background: #022d4f !important; border-radius: 6px !important; }
+#notifPopup .body { scrollbar-color: #022d4f #01111c !important; }
+
+/* ปรับขนาดบนหน้าจอเล็ก */
+@media (max-width: 480px) {
+  #notifPopup {
+    width: calc(100% - 16px) !important;
+    left: 8px !important;
+    right: 8px !important;
+  }
+}
+
+/* ปรับตามต้องการ */
+/* ทำให้ฟอร์มค้นหาใน navbar เป็นสีเทา และตัวอักษรเป็นสีเทาอ่อนเดียวกัน */
+.navbar .input-group .form-control,
+.navbar .input-group .form-select {
+    background-color: #5b5b5bff !important;
+    border: 1px solid #5b5b5bff !important;
+    color: #d6d6d6 !important; /* สีตัวอักษรเทาอ่อนเดียวกัน */
+    box-shadow: none !important;
+    font-weight: 700 !important; /* เพิ่ม: ทำให้ตัวอักษรในช่องค้นหาเป็น bold */
+}
+.navbar .input-group .form-control::placeholder {
+    color: #d0d0d0 !important; /* placeholder เทาอ่อน */
+    opacity: 1 !important;
+    font-weight: 600 !important; /* เพิ่ม: placeholder ให้หนาพอสมควร */
+}
+/* ให้ตัวเลือกใน select อ่านได้และใช้สีเดียวกัน */
+.navbar .input-group .form-select,
+.navbar .input-group .form-select option {
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+    color: #d6d6d6 !important;
+    background-color: #5b5b5bff !important;
+}
+/* ปรับปุ่มค้นหาให้เข้ากับโทนสี */
+.navbar .input-group .btn.btn-custom {
+    background-color: #374151 !important;
+    border: 1px solid #04406e !important;
+    color: #d6d6d6 !important;
+}
+.navbar .input-group .btn.btn-custom i {
+    color: #d6d6d6 !important;
+}
+.navbar .input-group .form-control:focus,
+.navbar .input-group .form-select:focus,
+.navbar .input-group .btn.btn-custom:focus {
+    box-shadow: 0 0 0 0.12rem rgba(0,0,0,0.06) !important;
+    outline: none !important;
+}
+
+.notif-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 11px;
+    height: 11px;
+    background: #dc3545;
+    border-radius: 50%;
+    display: none;
+    border: 2px solid #01182a;
+    z-index: 10;
+    pointer-events: none;
+}
+#notifBtn {
+    position: relative !important;
+}

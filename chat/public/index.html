@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Chat App</title>
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+
+        #friendId,
+        #connectBtn,
+        .disconnect-btn {
+            display: none !important;
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-list">
+            <div class="chat-list-header">
+                <h2>Messages</h2>
+                <div class="search-container">
+                    <input type="text" id="searchInput" placeholder="Search contacts...">
+                    <div id="searchResults" class="search-results"></div>
+                </div>
+            </div>
+            <div id="recentChats"></div>
+        </div>
+        <div class="chat-main">
+            <div class="chat-info">
+                <div>
+                    <input type="hidden" id="myId"/>
+                </div>
+                <div>
+                    <input type="number" id="friendId" placeholder="Enter ID"/>
+                </div>
+                <button id="connectBtn">Connect</button>
+                <button class="disconnect-btn">Disconnect</button>
+            </div>
+            <ul id="messages">
+                <div class="empty-state">
+                    <i class="fa-regular fa-comments"></i>
+                    <h3>No active conversation</h3>
+                    <p>Start a chat by entering a friend's ID and clicking Connect</p>
+                </div>
+            </ul>
+            <form id="form" action="">
+                <input id="input" autocomplete="off" placeholder="Type a message..." disabled/>
+                <button disabled><i class="fa-solid fa-paper-plane"></i></button>
+            </form>
+        </div>
+        <br>
+
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        // แยก baseImageUrl สำหรับ private chat และ team chat
+        const baseImageUrl = (() => {
+            const protocol = window.location.protocol;
+            const hostname = window.location.hostname;
+            return `${protocol}//${hostname}/valproject`;
+        })();
+
+        // Base URL สำหรับ Team Chat
+        const teamImageUrl = (() => {
+            const protocol = window.location.protocol;
+            const hostname = window.location.hostname;
+            return `${protocol}//${hostname}/valproject`;
+        })();
+
+        // ✅ เพิ่มโค๊ดเสียงแจ้งเตือน
+        const notifySound = new Audio('/sounds/notification.mp3');
+        notifySound.volume = 0.5; // ตั้งระดับเสียง 50%
+
+        const socket = io();
+        const messages = document.getElementById('messages');
+        const form = document.getElementById('form');
+        const input = document.getElementById('input');
+        const myIdInput = document.getElementById('myId');
+        const friendIdInput = document.getElementById('friendId');
+        const connectBtn = document.getElementById('connectBtn');
+
+        let myId = null;
+        let friendId = null;
+        let name = null;
+        let myTeamId = null;
+        let currentChatType = 'private';
+        let currentTeamId = null;
+        
+        // ✅ โหลด unread จาก localStorage ตอนเริ่มหน้า
+        const storedUnread = localStorage.getItem('unreadChats');
+        const unreadChats = storedUnread ? new Set(JSON.parse(storedUnread)) : new Set();
+        
+        // ✅ เพิ่ม unread teams
+        const storedUnreadTeams = localStorage.getItem('unreadTeams');
+        const unreadTeams = storedUnreadTeams ? new Set(JSON.parse(storedUnreadTeams)) : new Set();
+
+        // typing logic
+        let typing = false;
+        let lastTypingTime = 0;
+        const TYPING_TIMER_LENGTH = 1000;
+        const typingUsers = new Set();
+
+        function updateTyping() {
+            if (!typing) {
+                typing = true;
+                if (currentChatType === 'team') {
+                    socket.emit('typing', { name, userId: myId, type: 'team', teamId: currentTeamId });
+                } else {
+                    socket.emit('typing', { name, myId, friendId, type: 'private' });
+                }
+            }
+            lastTypingTime = Date.now();
+
+            setTimeout(() => {
+                const timeDiff = Date.now() - lastTypingTime;
+                if (timeDiff >= TYPING_TIMER_LENGTH && typing) {
+                    if (currentChatType === 'team') {
+                        socket.emit('stop typing', { name, userId: myId, type: 'team', teamId: currentTeamId });
+                    } else {
+                        socket.emit('stop typing', { name, myId, friendId, type: 'private' });
+                    }
+                    typing = false;
+                }
+            }, TYPING_TIMER_LENGTH);
+        }
+
+        function renderTyping() {
+            document.querySelectorAll('.typing').forEach(n => n.remove());
+            if (typingUsers.size === 0) return;
+            const li = document.createElement('li');
+            li.classList.add('typing');
+            const span = document.createElement('span');
+            const users = Array.from(typingUsers);
+            
+            const typingDots = document.createElement('div');
+            typingDots.className = 'typing-dots';
+            typingDots.innerHTML = '<span></span><span></span><span></span>';
+            
+            span.textContent = users.length === 1 ? `${users[0]} is typing ` : `${users.join(', ')} are typing `;
+            span.appendChild(typingDots);
+            li.appendChild(span);
+            messages.appendChild(li);
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        async function loadChatHistory() {
+            try {
+                const response = await fetch(`/api/chat-history?fromId=${myId}&toId=${friendId}&type=private`);
+                const history = await response.json();
+                
+                messages.innerHTML = '';
+                
+                history.forEach(msg => {
+                    const message = document.createElement('li');
+                    const messageItem = document.createElement('span');
+                    messageItem.textContent = `${msg.sender_name}: ${msg.message}`;
+                    
+                    // เช็คว่าข้อความเป็นของเราหรือไม่โดยเทียบ sender_id กับ myId
+                    if(parseInt(msg.sender_id) === parseInt(myId)) {
+                        message.classList.add('right');
+                    }
+                    
+                    message.appendChild(messageItem);
+                    messages.appendChild(message);
+                });
+                
+                messages.scrollTop = messages.scrollHeight;
+            } catch (err) {
+                console.error('Error loading chat history:', err);
+            }
+        }
+
+        function saveConnectionToLocalStorage(myId, friendId, name) {
+            localStorage.setItem('chatConnection', JSON.stringify({
+                myId,
+                friendId, 
+                name
+            }));
+        }
+
+        function loadConnectionFromLocalStorage() {
+            const saved = localStorage.getItem('chatConnection');
+            return saved ? JSON.parse(saved) : null;
+        }
+
+        async function connectChat(savedMyId, savedFriendId) {
+            try {
+                console.log('🔵 Connecting private chat:', savedMyId, 'to', savedFriendId);
+                
+                if (!savedMyId || !savedFriendId) {
+                    throw new Error('Invalid user IDs provided');
+                }
+
+                const response = await fetch(`/api/verify-users?myId=${savedMyId}&friendId=${savedFriendId}`);
+                const data = await response.json();
+                
+                if (!data.success || !data.users || data.users.length !== 2) {
+                    throw new Error('Failed to verify users');
+                }
+
+                const myUser = data.users.find(u => u.user_id === parseInt(savedMyId));
+                const friendUser = data.users.find(u => u.user_id === parseInt(savedFriendId));
+
+                if (!myUser || !friendUser) {
+                    throw new Error('One or both users not found');
+                }
+
+                // Leave team room if in team chat
+                if (currentChatType === 'team' && currentTeamId) {
+                    console.log('🔴 Leaving team room:', currentTeamId);
+                    socket.emit('leave team', { userId: savedMyId, teamId: currentTeamId });
+                }
+
+                // Clear existing state
+                typingUsers.clear();
+                messages.innerHTML = '';
+                
+                // Set user information
+                myId = savedMyId;
+                friendId = savedFriendId;
+                name = myUser.first_name;
+
+                console.log('✅ Set myId:', myId, 'friendId:', friendId, 'name:', name);
+
+                // Enable chat UI
+                input.disabled = false;
+                form.querySelector('button').disabled = false;
+                myIdInput.value = myId;
+                friendIdInput.value = friendId;
+
+                // Update chat header
+                const chatInfo = document.querySelector('.chat-info');
+                const friendAvatar = friendUser.profile_img 
+                    ? `${baseImageUrl}/${friendUser.profile_img}` // Added missing slash
+                    : `${baseImageUrl}/img/agents/default.png`;
+                
+                chatInfo.innerHTML = `
+                    <div class="private-chat-header" style="display: flex; align-items: center; width: 100%;">
+                        <h3 style="margin: 0;">${friendUser.first_name}</h3>
+                        <button class="disconnect-btn" style="margin-left: auto;">Disconnect</button>
+                    </div>
+                `;
+
+                const disconnectBtn = chatInfo.querySelector('.disconnect-btn');
+                if (disconnectBtn) {
+                    disconnectBtn.onclick = () => {
+                        localStorage.removeItem('chatConnection');
+                        location.reload();
+                    };
+                }
+
+                // Set chat type
+                currentChatType = 'private';
+                currentTeamId = null;
+
+                console.log('✅ Joining private room...');
+                // Join chat room
+                socket.emit('join', { myId, friendId, name });
+                socket.emit('identify', { userId: myId });
+
+                // Load chat data
+                await Promise.all([
+                    loadChatHistory(),
+                    loadRecentChats(savedMyId)
+                ]);
+                
+                console.log('✅ Private chat connected successfully');
+                return true;
+
+            } catch (err) {
+                console.error('❌ Error connecting chat:', err);
+                alert(`Failed to connect: ${err.message}`);
+                return false;
+            }
+        }
+
+        connectBtn.addEventListener('click', async () => {
+            const newMyId = myId || parseInt(myIdInput.value);
+            const newFriendId = parseInt(friendIdInput.value);
+            
+            if (!newMyId || isNaN(newMyId)) {
+                alert('Invalid user ID');
+                return;
+            }
+            
+            if (!newFriendId || isNaN(newFriendId)) {
+                alert('Please enter friend ID');
+                return;
+            }
+
+            const success = await connectChat(newMyId, newFriendId);
+            if (success) {
+                saveConnectionToLocalStorage(newMyId, newFriendId, name);
+            }
+        });
+        
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (input.value) {
+                if (typing) {
+                    socket.emit('stop typing', { name, myId, friendId });
+                    typing = false;
+                }
+
+                const messageData = {
+                    name: name,
+                    msg: input.value,
+                    fromId: myId,
+                    type: currentChatType
+                };
+
+                if (currentChatType === 'team') {
+                    messageData.teamId = currentTeamId;
+                } else {
+                    messageData.toId = friendId;
+                }
+
+                console.log('📤 Sending message:', messageData);
+                socket.emit('chat message', messageData);
+                input.value = '';
+            }
+        });
+
+        input.addEventListener('input', () => {
+            updateTyping();
+        });
+
+        // ✅ SOCKET EVENT HANDLERS - ไม่ซ้ำซ้อน
+        socket.on("chat message", (msgObject) => {
+            console.log('📨 Received message:', JSON.stringify(msgObject));
+            console.log('📍 Current context:', {
+                myId: myId,
+                friendId: friendId,
+                currentTeamId: currentTeamId,
+                currentChatType: currentChatType,
+                msgFromId: msgObject.fromId,
+                msgToId: msgObject.toId,
+                msgTeamId: msgObject.teamId,
+                msgType: msgObject.type
+            });
+            
+            const emptyState = document.querySelector('.empty-state');
+            if (emptyState) emptyState.remove();
+
+            // ✅ แปลงเป็น parseInt ทั้งหมดเพื่อให้แน่ใจว่าเปรียบเทียบถูกต้อง
+            const normalizedMyId = parseInt(myId);
+            const normalizedFriendId = parseInt(friendId);
+            const normalizedCurrentTeamId = parseInt(currentTeamId);
+            const normalizedMsgFromId = parseInt(msgObject.fromId);
+            const normalizedMsgToId = parseInt(msgObject.toId);
+            const normalizedMsgTeamId = parseInt(msgObject.teamId);
+
+            // ตรวจสอบว่าเป็นข้อความสำหรับแชทปัจจุบันหรือไม่
+            let isCurrentChat = false;
+            
+            if (msgObject.type === 'team' && currentChatType === 'team') {
+                isCurrentChat = (normalizedMsgTeamId === normalizedCurrentTeamId);
+                console.log('🔍 Team message check:', {
+                    msgTeamId: normalizedMsgTeamId,
+                    currentTeamId: normalizedCurrentTeamId,
+                    isMatch: isCurrentChat
+                });
+            } else if (msgObject.type === 'private' && currentChatType === 'private') {
+                const isSentByMe = normalizedMsgFromId === normalizedMyId && normalizedMsgToId === normalizedFriendId;
+                const isReceivedByMe = normalizedMsgFromId === normalizedFriendId && normalizedMsgToId === normalizedMyId;
+                isCurrentChat = isSentByMe || isReceivedByMe;
+                console.log('🔍 Private message check:', {
+                    msgFrom: normalizedMsgFromId,
+                    msgTo: normalizedMsgToId,
+                    myId: normalizedMyId,
+                    friendId: normalizedFriendId,
+                    isSentByMe: isSentByMe,
+                    isReceivedByMe: isReceivedByMe,
+                    isMatch: isCurrentChat
+                });
+            }
+
+            if (isCurrentChat) {
+                console.log('✅ Message is for current chat - displaying');
+                const message = document.createElement('li');
+                const messageItem = document.createElement('span');
+                messageItem.textContent = `${msgObject.name}: ${msgObject.msg}`;
+                
+                if (normalizedMsgFromId === normalizedMyId) {
+                    message.classList.add('right');
+                }
+                
+                message.appendChild(messageItem);
+                messages.appendChild(message);
+                messages.scrollTop = messages.scrollHeight;
+            } else {
+                console.log('⚠️ Message is NOT for current chat');
+                console.log('Reason: Type mismatch or ID mismatch');
+                // ✅ เล่นเสียงแจ้งเตือนสำหรับข้อความจากแชทอื่น
+                notifySound.play().catch(() => {
+                    console.log('Could not play notification sound');
+                });
+            }
+
+            // อัพเดท recent chats
+            if (myId) {
+                loadRecentChats(myId);
+            }
+
+            // เพิ่มการแจ้งเตือนสำหรับแชทที่ไม่ได้เปิดอยู่
+            if (!isCurrentChat && msgObject.type === 'private') {
+                const otherId = normalizedMsgFromId === normalizedMyId ? normalizedMsgToId : normalizedMsgFromId;
+                unreadChats.add(otherId);
+                localStorage.setItem('unreadChats', JSON.stringify(Array.from(unreadChats)));
+                const chatItem = document.querySelector(`.chat-item[data-other-id="${otherId}"]`);
+                if (chatItem) {
+                    chatItem.classList.add('unread');
+                }
+            }
+            
+            // ✅ เพิ่มการแจ้งเตือนสำหรับ team chat ที่ไม่ได้เปิดอยู่
+            if (!isCurrentChat && msgObject.type === 'team') {
+                const teamId = normalizedMsgTeamId;
+                unreadTeams.add(teamId);
+                localStorage.setItem('unreadTeams', JSON.stringify(Array.from(unreadTeams)));
+                const teamChatItem = document.querySelector(`.chat-item[data-team-id="${teamId}"]`);
+                if (teamChatItem) {
+                    teamChatItem.classList.add('unread');
+                }
+                console.log('🔔 Team chat unread added:', teamId);
+            }
+            
+            // ✅ เล่นเสียงแจ้งเตือนเมื่อได้ข้อความจากคนอื่น (ไม่ใช่ข้อความของตัวเอง)
+            if (normalizedMsgFromId !== normalizedMyId) {
+                console.log('🔊 Playing notification sound for message from:', msgObject.name);
+                notifySound.play().catch(() => {
+                    console.log('Could not play notification sound');
+                });
+            }
+        });
+
+        socket.on('typing', (data) => {
+            if (data.type === 'team') {
+                if (data.teamId === currentTeamId && data.userId !== myId) {
+                    typingUsers.add(data.name);
+                    renderTyping();
+                }
+            } else {
+                if (data.myId === friendId && data.friendId === myId) {
+                    typingUsers.add(data.name);
+                    renderTyping();
+                }
+            }
+        });
+
+        socket.on('stop typing', (data) => {
+            if (data.type === 'team') {
+                if (data.teamId === currentTeamId && data.userId !== myId) {
+                    typingUsers.delete(data.name);
+                    renderTyping();
+                }
+            } else {
+                if (data.myId === friendId && data.friendId === myId) {
+                    typingUsers.delete(data.name);
+                    renderTyping();
+                }
+            }
+        });
+
+        socket.on('error', (data) => {
+            alert(data.message);
+        });
+
+        socket.on('update recent chats', (payload) => {
+            if (myId) {
+                loadRecentChats(myId);
+            }
+        });
+
+        // Connection handlers
+        socket.on('connect', () => {
+            console.log('🟢 Connected to server');
+            // Re-join rooms when reconnected
+            if (myId) {
+                socket.emit('identify', { userId: myId });
+                if (currentChatType === 'team' && currentTeamId) {
+                    socket.emit('join team', { userId: myId, teamId: currentTeamId });
+                } else if (friendId) {
+                    socket.emit('join', { myId, friendId, name });
+                }
+            }
+        });
+
+        socket.on('disconnect', () => {
+            console.log('🔴 Disconnected from server');
+        });
+
+        socket.on('connect_error', () => {
+            console.log('❌ Connection error');
+        });
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const userId = urlParams.get('userId');
+            const chatWith = urlParams.get('chatWith');
+            const autoMessage = urlParams.get('message');
+            
+            if (userId) {
+                myIdInput.value = userId;
+                myId = parseInt(userId);
+
+                socket.emit('identify', { userId: myId });
+
+                await loadRecentChats(userId);
+                
+                // Auto-connect if chatWith parameter is provided
+                if (chatWith) {
+                    const friendId = parseInt(chatWith);
+                    const success = await connectChat(myId, friendId);
+                    // Reload recent chats after successful connection to show the new chat
+                    if (success) {
+                        await new Promise(resolve => setTimeout(resolve, 500)); // brief delay
+                        await loadRecentChats(userId);
+                        
+                        // Auto-send message if provided
+                        if (autoMessage && autoMessage.trim()) {
+                            await new Promise(resolve => setTimeout(resolve, 300));
+                            input.value = autoMessage;
+                            form.dispatchEvent(new Event('submit'));
+                        }
+                    }
+                } else {
+                    // Otherwise, load saved connection
+                    const savedConnection = loadConnectionFromLocalStorage();
+                    if (savedConnection && savedConnection.myId === parseInt(userId)) {
+                        await connectChat(savedConnection.myId, savedConnection.friendId);
+                    }
+                }
+            }
+        });
+
+        const disconnectBtn = document.querySelector('.disconnect-btn');
+        disconnectBtn.onclick = () => {
+            localStorage.removeItem('chatConnection');
+            location.reload();
+        };
+
+
+// ✅ แก้ไขในฟังก์ชัน loadRecentChats - ส่วนที่สร้าง chat item
+
+async function loadRecentChats(userId) {
+    try {
+        const response = await fetch(`/api/recent-chats/${userId}`);
+        const data = await response.json();
+        
+        if (data.userTeam) {
+            myTeamId = data.userTeam.team_id;
+        }
+
+        const recentChatsDiv = document.getElementById('recentChats');
+        recentChatsDiv.innerHTML = '';
+
+        if (!data.chats?.length) {
+            recentChatsDiv.innerHTML = `
+                <div class="empty-state">
+                    <i class="fa-regular fa-comment-dots"></i>
+                    <h3>No recent chats</h3>
+                    <p>Start a new conversation by searching for users</p>
+                </div>
+            `;
+            return;
+        }
+
+        const teamSection = document.createElement('div');
+        teamSection.className = 'chat-section team-chats';
+        teamSection.innerHTML = '<h3>Team Chats</h3>';
+
+        const privateSection = document.createElement('div');
+        privateSection.className = 'chat-section private-chats';
+        privateSection.innerHTML = '<h3>Private Chats</h3>';
+
+        data.chats.forEach(chat => {
+            const chatEl = document.createElement('div');
+            chatEl.className = 'chat-item';
+           
+            if (chat.team_id) chatEl.setAttribute('data-team-id', chat.team_id);
+            if (chat.other_id) chatEl.setAttribute('data-other-id', chat.other_id);
+            
+            // ✅ เช็คว่าเป็น chat ที่กำลังเปิดอยู่หรือไม่ และเพิ่ม active class
+            if (chat.chat_type === 'private' && friendId && parseInt(chat.other_id) === parseInt(friendId)) {
+                chatEl.classList.add('active');
+            } else if (chat.chat_type === 'team' && currentTeamId && parseInt(chat.team_id) === parseInt(currentTeamId)) {
+                chatEl.classList.add('active');
+            }
+            
+            // ✅ เช็คว่าเป็น unread chat ไหม (จากหน่วยความจำ)
+            if (chat.chat_type === 'private' && unreadChats.has(parseInt(chat.other_id))) {
+                chatEl.classList.add('unread');
+            }
+            
+            // ✅ เช็คว่าเป็น unread team chat ไหม
+            if (chat.chat_type === 'team' && unreadTeams.has(parseInt(chat.team_id))) {
+                chatEl.classList.add('unread');
+            }
+            
+            let avatarSrc;
+            if (chat.chat_type === 'team') {
+                avatarSrc = chat.avatar 
+                    ? `${teamImageUrl}/${chat.avatar}` 
+                    : `${teamImageUrl}/img/agents/default.png`;
+            } else {
+                avatarSrc = chat.avatar 
+                    ? `${baseImageUrl}${chat.avatar}` 
+                    : `${baseImageUrl}/img/agents/default.png`;
+            }
+            
+            chatEl.innerHTML = `
+                <img src="${avatarSrc}" alt="${chat.name}">
+                <div class="chat-item-info">
+                    <div class="chat-item-name">${chat.name}</div>
+                    <div class="chat-item-last-message">${chat.last_message || 'No messages yet'}</div>
+                </div>
+                <div class="chat-item-time">${formatTime(chat.last_message_time)}</div>
+            `;
+            
+            // ✅ แก้ไข event listener ให้เพิ่ม/ลบ active class อย่างถูกต้อง
+            chatEl.addEventListener('click', async () => {
+                console.log('🖱️ Clicked chat item:', chat.name);
+                
+                // ลบ active class จากทุก chat item
+                document.querySelectorAll('.chat-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                
+                // เพิ่ม active class ให้กับ chat item ที่คลิก
+                chatEl.classList.add('active');
+                chatEl.classList.remove('unread');
+                
+                // ✅ ลบออกจาก unreadChats เมื่อเปิดอ่าน
+                if (chat.chat_type === 'private') {
+                    unreadChats.delete(parseInt(chat.other_id));
+                    localStorage.setItem('unreadChats', JSON.stringify(Array.from(unreadChats)));
+                }
+                
+                // ✅ ลบออกจาก unreadTeams เมื่อเปิดอ่าน team chat
+                if (chat.chat_type === 'team') {
+                    unreadTeams.delete(parseInt(chat.team_id));
+                    localStorage.setItem('unreadTeams', JSON.stringify(Array.from(unreadTeams)));
+                }
+                
+                console.log('✅ Added active class to:', chat.name);
+                
+                if (chat.chat_type === 'team') {
+                    await connectTeamChat(chat.team_id);
+                } else {
+                    await connectChat(userId, chat.other_id);
+                }
+            });
+            
+            if (chat.chat_type === 'team') {
+                teamSection.appendChild(chatEl);
+            } else {
+                privateSection.appendChild(chatEl);
+            }
+        });
+
+        if (teamSection.children.length > 1) {
+            recentChatsDiv.appendChild(teamSection);
+        }
+        if (privateSection.children.length > 0) {
+            recentChatsDiv.appendChild(privateSection);
+        }
+
+    } catch (err) {
+        console.error('Error loading recent chats:', err);
+    }
+}
+
+// ✅ ตรวจสอบว่า CSS ทำงานหรือไม่ - เพิ่มใน console เพื่อ debug
+console.log('CSS check - active class styles should apply to .chat-item.active');
+
+// ✅ เพิ่มการเช็ค active state หลังโหลดหน้า
+document.addEventListener('DOMContentLoaded', async () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const userId = urlParams.get('userId');
+    
+    if (userId) {
+        myIdInput.value = userId;
+        myId = parseInt(userId);
+
+        socket.emit('identify', { userId: myId });
+
+        await loadRecentChats(userId);
+        
+        const savedConnection = loadConnectionFromLocalStorage();
+        if (savedConnection && savedConnection.myId === parseInt(userId)) {
+            await connectChat(savedConnection.myId, savedConnection.friendId);
+            
+            // ✅ หลังจาก connect เสร็จ ให้ reload recent chats อีกครั้งเพื่ออัพเดท active state
+            setTimeout(() => {
+                loadRecentChats(userId);
+            }, 500);
+        }  
+    }
+});
+
+// ✅ Debug function - เรียกใช้ในกรณีที่ active ยังไม่แสดง
+function debugActiveState() {
+    const activeItems = document.querySelectorAll('.chat-item.active');
+    console.log('Active chat items:', activeItems.length);
+    activeItems.forEach(item => {
+        console.log('Active item:', item);
+        const computedStyle = window.getComputedStyle(item);
+        console.log('Background:', computedStyle.background);
+        console.log('Border:', computedStyle.border);
+    });
+}
+
+// เรียกใช้ debug หลังโหลดหน้า 2 วินาที
+setTimeout(debugActiveState, 2000);
+        function formatTime(timestamp) {
+            if (!timestamp) return '';
+            const date = new Date(timestamp);
+            const now = new Date();
+            
+            if (date.toDateString() === now.toDateString()) {
+                return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            }
+            return date.toLocaleDateString();
+        }
+
+        const searchInput = document.getElementById('searchInput');
+        const searchResults = document.getElementById('searchResults');
+        let searchTimeout;
+
+        searchInput.addEventListener('input', () => {
+            clearTimeout(searchTimeout);
+            const searchTerm = searchInput.value;
+            
+            if (searchTerm.length < 2) {
+                searchResults.style.display = 'none';
+                return;
+            }
+
+            searchTimeout = setTimeout(async () => {
+                try {
+                    const response = await fetch(`/api/search-users?q=${searchTerm}&userId=${myId}`);
+                    const users = await response.json();
+                    
+                    searchResults.innerHTML = users.map(user => {
+                        // ใช้ baseImageUrl สำหรับ private chat search
+                        const avatarSrc = user.profile_img 
+                            ? `${baseImageUrl}${user.profile_img}` 
+                            : `${baseImageUrl}/img/agents/default.png`;
+                        
+                        return `
+                            <div class="search-result-item" data-user-id="${user.user_id}" data-user-name="${user.first_name}">
+                                <img src="${avatarSrc}" alt="Profile">
+                                <span>${user.first_name}</span>
+                            </div>
+                        `;
+                    }).join('');
+                    
+                    document.querySelectorAll('.search-result-item').forEach(item => {
+                        item.addEventListener('click', function() {
+                            const userId = parseInt(this.getAttribute('data-user-id'));
+                            const userName = this.getAttribute('data-user-name');
+                            selectUserHandler(userId, userName);
+                        });
+                    });
+                    
+                    searchResults.style.display = users.length ? 'block' : 'none';
+                } catch (err) {
+                    console.error('Error searching users:', err);
+                }
+            }, 300);
+        });
+
+        async function selectUserHandler(userId, userName) {
+            console.log('👤 Selecting user:', userId, userName);
+            
+            searchResults.style.display = 'none';
+            searchInput.value = '';
+            
+            if (!myId) {
+                alert('Please ensure you are logged in');
+                return;
+            }
+            
+            const success = await connectChat(myId, userId);
+            if (success) {
+                saveConnectionToLocalStorage(myId, userId, name);
+            }
+        }
+
+        document.addEventListener('click', (e) => {
+            if (!searchResults.contains(e.target) && e.target !== searchInput) {
+                searchResults.style.display = 'none';
+            }
+        });
+
+        async function connectTeamChat(teamId) {
+            try {
+                console.log('🟢 Connecting team chat:', teamId);
+                
+                typingUsers.clear();
+                messages.innerHTML = '';
+                
+                input.disabled = false;
+                form.querySelector('button').disabled = false;
+                
+                document.querySelectorAll('.chat-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                document.querySelector(`.chat-item[data-team-id="${teamId}"]`)?.classList.add('active');
+                
+                const chatInfo = document.querySelector('.chat-info');
+                chatInfo.innerHTML = `
+                    <div class="team-chat-header">
+                        <h3>Team Chat</h3>
+                        <span class="team-members-online"></span>
+                    </div>
+                `;
+                
+                currentChatType = 'team';
+                currentTeamId = teamId;
+                friendId = null;
+                
+                console.log('✅ Joining team room...');
+                socket.emit('join team', {
+                    userId: myId,
+                    teamId: teamId
+                });
+                
+                socket.emit('identify', { userId: myId });
+                
+                await loadTeamChatHistory(teamId, myId);
+                
+                console.log('✅ Team chat connected');
+            } catch (err) {
+                console.error('Error connecting to team chat:', err);
+            }
+        }
+
+        async function loadTeamChatHistory(teamId, userId) {
+            try {
+                const response = await fetch(`/api/team-chat-history/${teamId}`);
+                const history = await response.json();
+                
+                messages.innerHTML = '';
+                
+                history.forEach(msg => {
+                    const message = document.createElement('li');
+                    const messageItem = document.createElement('span');
+                    messageItem.textContent = `${msg.sender_name}: ${msg.message}`;
+                    
+                    if(parseInt(msg.sender_id) === parseInt(userId)) {
+                        message.classList.add('right');
+                    }
+                    
+                    message.appendChild(messageItem);
+                    messages.appendChild(message);
+                });
+                
+                messages.scrollTop = messages.scrollHeight;
+            } catch (err) {
+                console.error('Error loading team chat history:', err);
+            }
+        }
+    </script>
+</body>
+</html>

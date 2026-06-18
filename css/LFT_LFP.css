@@ -1,0 +1,59 @@
+      
+         :root {
+            --valorant-red: #ff4655;
+            --valorant-dark: #0f1923;
+            --valorant-light: #ece8e1;
+        }
+        body {
+            background-color: var(--valorant-dark);
+            color: var(--valorant-light);
+            font-family: 'Tungsten-Bold', sans-serif;
+        }
+        .team-card {
+            background-color: #01182a ;
+            border-radius: 8px;
+            transition: transform 0.3s;
+            border-left: 4px solid var(--valorant-red);
+            margin-bottom: 20px;
+            height: 100%;
+        }
+        .team-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+        .team-name {
+            color: var(--valorant-red);
+            font-weight: bold;
+        }
+        .search-box {
+            background-color: #01182a ;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .region-badge {
+            background-color: #2a3b4c;
+            color: var(--valorant-light);
+            font-weight: normal;
+        }
+        .player-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid var(--valorant-red);
+            object-fit: cover;
+        }
+        .empty-roles {
+            color: #6c757d;
+            font-style: italic;
+        }
+        .filter-label {
+            color: var(--valorant-red);
+            font-weight: bold;
+        }
+        @media (max-width: 768px) {
+            .team-card {
+                margin-bottom: 15px;
+            }
+        }

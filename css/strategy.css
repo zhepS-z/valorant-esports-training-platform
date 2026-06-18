@@ -1,0 +1,387 @@
+   * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0d1429 100%);
+            color: #e0e0e0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+        }
+
+        .container-main {
+            display: grid;
+            grid-template-columns: 280px 1fr 280px;
+            height: 100vh;
+            gap: 12px;
+            padding: 12px;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            background: rgba(20, 25, 50, 0.4);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(100, 150, 255, 0.1);
+            border-radius: 16px;
+            padding: 16px;
+            gap: 16px;
+            overflow-y: auto;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: rgba(100, 150, 255, 0.3);
+            border-radius: 3px;
+        }
+
+        .section-title {
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: #6495ff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title i {
+            font-size: 14px;
+        }
+
+        .map-dropdown {
+            position: relative;
+        }
+
+        .map-btn {
+            width: 100%;
+            height: 72px;
+            border: 1px solid rgba(100, 150, 255, 0.2);
+            background: rgba(30, 35, 70, 0.6);
+            border-radius: 12px;
+            cursor: pointer;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            padding: 0;
+        }
+
+        .map-btn:hover {
+            border-color: rgba(100, 150, 255, 0.5);
+            background: rgba(30, 35, 70, 1);
+            box-shadow: 0 8px 24px rgba(100, 150, 255, 0.15);
+        }
+
+        .map-btn img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .map-btn:hover img {
+            transform: scale(1.05);
+        }
+
+        .map-list {
+            position: absolute;
+            top: 85px;
+            left: 0;
+            right: 0;
+            background: rgba(15, 20, 45, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(100, 150, 255, 0.2);
+            border-radius: 12px;
+            max-height: 240px;
+            overflow-y: auto;
+            z-index: 100;
+            display: none;
+            flex-direction: column;
+        }
+
+        .map-list.active {
+            display: flex;
+        }
+
+        .map-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .map-list::-webkit-scrollbar-thumb {
+            background: rgba(100, 150, 255, 0.3);
+            border-radius: 3px;
+        }
+
+        .map-item {
+            height: 60px;
+            border-bottom: 1px solid rgba(100, 150, 255, 0.1);
+            cursor: pointer;
+            overflow: hidden;
+            transition: all 0.2s ease;
+        }
+
+        .map-item:last-child {
+            border-bottom: none;
+        }
+
+        .map-item:hover {
+            background: rgba(100, 150, 255, 0.1);
+        }
+
+        .map-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .tool-btn {
+            aspect-ratio: 1;
+            background: linear-gradient(135deg, rgba(100, 150, 255, 0.1) 0%, rgba(100, 150, 255, 0.05) 100%);
+            border: 1px solid rgba(100, 150, 255, 0.2);
+            border-radius: 12px;
+            color: #6495ff;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tool-btn:hover {
+            background: linear-gradient(135deg, rgba(100, 150, 255, 0.2) 0%, rgba(100, 150, 255, 0.1) 100%);
+            border-color: rgba(100, 150, 255, 0.5);
+            box-shadow: 0 8px 24px rgba(100, 150, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .tool-btn:active {
+            transform: translateY(0);
+        }
+
+        .center-area {
+            display: flex;
+            flex-direction: column;
+            background: rgba(20, 25, 50, 0.4);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(100, 150, 255, 0.1);
+            border-radius: 16px;
+            padding: 16px;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .map-canvas {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 15, 40, 0.5);
+            border-radius: 12px;
+            border: 2px dashed rgba(100, 150, 255, 0.2);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .map-canvas.dragover {
+            border-color: rgba(100, 150, 255, 0.5);
+            background: rgba(100, 150, 255, 0.05);
+        }
+
+        #mainMapImg {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            border-radius: 8px;
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+        }
+
+        .map-placeholder {
+            text-align: center;
+            color: rgba(200, 200, 200, 0.5);
+        }
+
+        .map-placeholder i {
+            font-size: 48px;
+            margin-bottom: 12px;
+            opacity: 0.3;
+        }
+
+        .agent-on-map {
+            position: absolute;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            cursor: grab;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+        }
+
+        .agent-on-map:hover {
+            transform: scale(1.1);
+        }
+
+        .agent-on-map:active {
+            cursor: grabbing;
+        }
+
+        .agent-on-map img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .agent-on-map.ally {
+            box-shadow: 0 0 16px rgba(255, 100, 100, 0.6), inset 0 0 8px rgba(255, 100, 100, 0.3);
+        }
+
+        .agent-on-map.enemy {
+            box-shadow: 0 0 16px rgba(100, 200, 255, 0.6), inset 0 0 8px rgba(100, 200, 255, 0.3);
+        }
+
+        .agent-select {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .team-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(30, 35, 70, 0.6);
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(100, 150, 255, 0.2);
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            background: rgba(100, 150, 255, 0.2);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            padding: 0;
+        }
+
+        .toggle-switch.ally {
+            background: rgba(255, 100, 100, 0.3);
+        }
+
+        .toggle-switch.enemy {
+            background: rgba(100, 200, 255, 0.3);
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 100, 100, 0.8);
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-switch.enemy::after {
+            left: 22px;
+            background: rgba(100, 200, 255, 0.8);
+        }
+
+        .team-label {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .agent-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            max-height: calc(100vh - 200px);
+            overflow-y: auto;
+        }
+
+        .agent-grid::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .agent-grid::-webkit-scrollbar-thumb {
+            background: rgba(100, 150, 255, 0.3);
+            border-radius: 3px;
+        }
+
+        .agent-card {
+            aspect-ratio: 1;
+            background: rgba(30, 35, 70, 0.6);
+            border: 1px solid rgba(100, 150, 255, 0.2);
+            border-radius: 12px;
+            cursor: grab;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .agent-card:hover {
+            border-color: rgba(100, 150, 255, 0.5);
+            background: rgba(30, 35, 70, 1);
+            box-shadow: 0 8px 24px rgba(100, 150, 255, 0.15);
+            transform: translateY(-4px);
+        }
+
+        .agent-card:active {
+            cursor: grabbing;
+        }
+
+        .agent-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .agent-card.selected {
+            border-color: rgba(100, 150, 255, 0.8);
+            box-shadow: 0 0 16px rgba(100, 150, 255, 0.3);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .agent-on-map {
+            animation: fadeIn 0.3s ease;
+        }

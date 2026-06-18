@@ -1,0 +1,486 @@
+:root {
+
+        --secondary: #01182a;
+        /* ใช้สี background จาก style.css */
+        --accent: #e9ecef;
+        /* ใช้สีข้อความจาก style.css */
+        --text: rgba(255, 255, 255, 0.78);
+        /* สีข้อความรอง */
+        --light: rgba(255, 255, 255, 0.1);
+        /* สีพื้นหลัง hover */
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        background-color: var(--secondary);
+        /* สีพื้นหลัง */
+        color: white !important;
+        /* เปลี่ยนสีข้อความเป็นสีขาว */
+        line-height: 1.6;
+    }
+
+    h1,
+    h2,
+    h3,
+    p,
+    a,
+    th,
+    td,
+    .stat-label,
+    .player-name,
+    .player-role,
+    .player-stat-label,
+    .player-stat-value,
+    .section-title {
+        color: white !important;
+        /* เปลี่ยนสีข้อความทุกองค์ประกอบเป็นสีขาว */
+    }
+
+    header {
+        background-color: var(--primary);
+        /* สี header */
+        padding: 1rem 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .logo h1 {
+        font-size: 1.8rem;
+        font-weight: 700;
+    }
+
+    nav ul {
+        display: flex;
+        list-style: none;
+        gap: 20px;
+    }
+
+    nav a {
+        color: var(--accent);
+        text-decoration: none;
+        font-weight: 600;
+        padding: 5px 10px;
+        border-radius: 4px;
+        transition: background-color 0.3s;
+    }
+
+    nav a:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .main-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .hero {
+        text-align: center;
+        padding: 3rem 0;
+        background: linear-gradient(rgba(15, 25, 35, 0.8), rgba(15, 25, 35, 0.9)), url('https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+        background-size: cover;
+        background-position: center;
+        border-radius: 10px;
+        margin-bottom: 2rem;
+    }
+
+    .hero h2 {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        color: var(--primary);
+    }
+
+    .hero p {
+        font-size: 1.2rem;
+        max-width: 800px;
+        margin: 0 auto 2rem;
+    }
+
+    .main-btn {
+        background: linear-gradient(45deg, #022d4f, #04406e);
+        /* ปรับสีปุ่ม */
+        color: var(--accent);
+        padding: 12px 24px;
+        border: none;
+        border-radius: 4px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+    }
+
+    .main-btn :hover {
+        background-color: #04406e;
+        /* สี hover */
+        transform: translateY(-2px);
+    }
+
+    .section-title {
+        text-align: center;
+        margin: 3rem 0 2rem;
+        color: var(--primary);
+        font-size: 2rem;
+    }
+
+    .dashboard {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 2rem;
+        margin-bottom: 3rem;
+    }
+
+    .card {
+        background-color: rgba(15, 25, 35, 0.9) !important;
+        /* เปลี่ยนสีพื้นหลังการ์ด */
+        border-radius: 10px !important;
+        padding: 1.5rem !important;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3) !important;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+    }
+
+    .card h3 {
+        color: var(--primary);
+        margin-bottom: 1rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding-bottom: 0.5rem;
+    }
+
+    .chart-main-container {
+        width: 100%;
+        height: 300px;
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        background-color: rgba(20, 30, 40, 0.8);
+        border-radius: 8px;
+    }
+
+    /* เพิ่ม style สำหรับ canvas */
+    canvas {
+        max-width: 100%;
+        max-height: 100%;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .stat-item {
+        text-align: center;
+        padding: 1rem;
+        background-color: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+    }
+
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--primary);
+    }
+
+    .stat-label {
+        font-size: 0.9rem;
+        opacity: 0.8;
+    }
+
+    .player-roster {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+    }
+
+    .player-card {
+        background-color: var(--secondary);
+        /* สีการ์ดผู้เล่น */
+        border-radius: 8px;
+        padding: 1rem;
+        text-align: center;
+        transition: transform 0.3s;
+    }
+
+    .team-premier-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 20px;
+    }
+
+    .team-roster {
+        flex: 1;
+        background-color: var(--secondary);
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        color: var(--text);
+    }
+
+    .team-roster h3 {
+        text-align: center;
+        margin-bottom: 15px;
+        font-size: 1.5rem;
+        color: var(--accent);
+    }
+
+    .team-card {
+        
+        flex: 1;
+        background-color: var(--secondary);
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        color: var(--text);
+    
+    }
+
+    .team-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .player-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 100%!important;
+        object-fit: contain;
+        overflow: hidden;
+        border: 2px solid var(--accent);
+    }
+
+        .team-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 20%;
+        object-fit: cover !important;
+        overflow: hidden;
+        background-color: #011422!important;
+    }
+
+
+
+    .player-name {
+        font-weight: bold;
+        font-size: 1.2rem;
+    }
+
+    .player-role {
+        font-size: 1rem;
+        opacity: 0.8;
+    }
+
+    .team-roster {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+    }
+
+    .team-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(0, 0, 0, 0.8);
+        border-radius: 8px;
+        padding: 10px;
+        width: 150px; /* ปรับขนาดการ์ด */
+        height: 200px; /* ปรับขนาดการ์ด */
+        overflow: hidden; /* ซ่อนส่วนที่ล้น */
+    }
+
+    .player-card:hover {
+        transform: translateY(-3px);
+    }
+
+    .player-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        margin: 0 auto 1rem;
+        background-color: var(--primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        font-weight: bold;
+    }
+
+    .player-name {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .player-role {
+        font-size: 0.9rem;
+        opacity: 0.8;
+        margin-bottom: 0.5rem;
+    }
+
+    .player-stats {
+        display: flex;
+        justify-content: space-around;
+        margin-top: 1rem;
+    }
+
+    .player-stat {
+        text-align: center;
+    }
+
+    .player-stat-value {
+        font-weight: 700;
+        color: var(--primary);
+    }
+
+    .player-stat-label {
+        font-size: 0.8rem;
+        opacity: 0.7;
+    }
+
+    .match-history {
+        overflow-x: auto !important;
+        background-color: rgba(0, 0, 0, 0.8) !important;
+        /* เพิ่มพื้นหลังเข้ม */
+        border-radius: 10px !important;
+        /* เพิ่มมุมโค้ง */
+        padding: 1rem !important;
+        /* เพิ่มระยะห่างภายใน */
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3) !important;
+        /* เพิ่มเงา */
+    }
+
+    table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+        margin-top: 1rem !important;
+        background-color: rgba(255, 255, 255, 0.05) !important;
+        /* เพิ่มพื้นหลังตาราง */
+        border-radius: 8px !important;
+        /* เพิ่มมุมโค้ง */
+        overflow: hidden !important;
+        /* ป้องกันการล้น */
+    }
+
+    th,
+    td {
+        padding: 12px 15px !important;
+        text-align: left !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+        color: var(--accent) !important;
+        /* ใช้สีข้อความที่เหมาะสม */
+    }
+
+    th {
+        background-color: rgba(255, 255, 255, 0.1) !important;
+        /* เพิ่มพื้นหลังหัวตาราง */
+        color: var(--primary) !important;
+        /* ใช้สีข้อความที่เหมาะสม */
+        font-weight: 600 !important;
+    }
+
+    tr:hover {
+        background-color: rgba(255, 255, 255, 0.05) !important;
+        /* เพิ่มสี hover */
+    }
+
+    .win {
+        color: #4CAF50 !important;
+        /* สีเขียวสำหรับชนะ */
+        font-weight: bold !important;
+        /* เพิ่มความหนา */
+    }
+
+    .loss {
+        color: #F44336 !important;
+        /* สีแดงสำหรับแพ้ */
+        font-weight: bold !important;
+        /* เพิ่มความหนา */
+    }
+
+    .team-composition {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 1rem;
+    }
+
+    .team-comp-agent {
+        text-align: center;
+        width: 80px;
+    }
+
+    .team-comp-agent img {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+    }
+
+    .team-comp-agent span {
+        display: block;
+        margin-top: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    footer {
+        text-align: center;
+        padding: 2rem;
+        margin-top: 3rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        font-size: 0.9rem;
+        opacity: 0.7;
+    }
+
+    @media (max-width: 768px) {
+        .dashboard {
+            grid-template-columns: 1fr;
+        }
+
+        .team-roster {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        nav ul {
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        header {
+            flex-direction: column;
+            gap: 1rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .team-roster {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .match-history table thead {
+        background-color: var(--primary);
+        /* พื้นหลังสีน้ำเงิน */
+        color: white !important;
+        /* ตัวหนังสือสีขาว */
+    }
+
